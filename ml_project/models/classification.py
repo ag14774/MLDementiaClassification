@@ -1,4 +1,7 @@
+import sys
+
 import numpy as np
+from scipy.stats import spearmanr
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -9,15 +12,25 @@ class AssignLabelsClassifier(BaseEstimator, TransformerMixin):
         self.base_estimator = base_estimator(**kwargs)
 
     def fit(self, X, y):
-        y = np.argmax(y, axis=1)
-        self.base_estimator.fit(X, y)
+        ylabels = np.argmax(y, axis=1)
+        self.base_estimator.fit(X, ylabels)
         return self
 
     def predict_proba(self, X):
         return self.base_estimator.predict_proba(X)
 
     def score(self, X, y):
-        return self.base_estimator.score(X, y)
+        ypred = self.predict_proba(X)
+        corrs = np.zeros(X.shape[0])
+        for i in range(0, X.shape[0]):
+            corrs[i] = spearmanr(y[i], ypred[i]).correlation
+
+        meanrho = np.mean(corrs)
+
+        print(meanrho)
+        sys.stdout.flush()
+
+        return meanrho
 
 
 class MeanPredictor(BaseEstimator, TransformerMixin):
