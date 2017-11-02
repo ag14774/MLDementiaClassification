@@ -12,10 +12,10 @@ from ml_project.models.utils import (StratifiedKFoldProbLabels, packY, scorer,
 class MetaClassifierRFE(RFECV):
     """docstring"""
 
-    def __init__(self, n_splits, shuffle, random_state, base_estimator,
+    def __init__(self, step, n_splits, shuffle, random_state, base_estimator,
                  **base_estimator_args):
         self.estimator = MetaClassifier(base_estimator, **base_estimator_args)
-        self.step = 1
+        self.step = step
         self.cv = StratifiedKFoldProbLabels(n_splits, shuffle, random_state)
         self.scoring = scorer
         self.verbose = 0
