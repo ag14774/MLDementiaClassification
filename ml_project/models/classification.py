@@ -24,6 +24,7 @@ class MetaClassifierRFE(RFECV):
     def fit(self, X, y):
         y = packY(y)
         super(MetaClassifierRFE, self).fit(X, y)
+        print("Selected " + str(self.n_features_))
         return self
 
 
