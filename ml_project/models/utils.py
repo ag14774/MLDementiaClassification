@@ -14,7 +14,5 @@ class Debugger(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         print("Shape of X: " + str(X.shape))
-        if y is not None:
-            print("Shape of y: " + str(y.shape))
         sys.stdout.flush()
         return X

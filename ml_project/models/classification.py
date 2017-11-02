@@ -6,14 +6,18 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
 
 
-class AssignLabelsClassifier(BaseEstimator, TransformerMixin):
+class MetaClassifier(BaseEstimator, TransformerMixin):
     """docstring"""
     def __init__(self, base_estimator, **kwargs):
         self.base_estimator = base_estimator(**kwargs)
 
     def fit(self, X, y):
-        ylabels = np.argmax(y, axis=1)
-        self.base_estimator.fit(X, ylabels)
+        n_samples, n_features = X.shape
+        n_labels = y.shape[1]
+        X = np.repeat(X, n_labels, 0)
+        weights = y.reshape(-1)
+        y = np.tile(np.arange(n_labels), n_samples)
+        self.base_estimator.fit(X, y, weights)
         return self
 
     def predict_proba(self, X):
