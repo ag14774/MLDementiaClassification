@@ -1,21 +1,22 @@
 import sys
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, MetaEstimatorMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_selection import RFECV
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ml_project.models.utils import scorer, packY, unpackY
+from ml_project.models.utils import (StratifiedKFoldProbLabels, packY, scorer,
+                                     unpackY)
 
 
 class MetaClassifierRFE(RFECV):
     """docstring"""
 
-    def __init__(self, cv, n_splits, shuffle, random_state, base_estimator,
+    def __init__(self, n_splits, shuffle, random_state, base_estimator,
                  **base_estimator_args):
         self.estimator = MetaClassifier(base_estimator, **base_estimator_args)
         self.step = 1
-        self.cv = cv(n_splits, shuffle, random_state)
+        self.cv = StratifiedKFoldProbLabels(n_splits, shuffle, random_state)
         self.scoring = scorer
         self.verbose = 0
         self.n_jobs = 1
