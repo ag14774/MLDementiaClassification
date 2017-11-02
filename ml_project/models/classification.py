@@ -1,17 +1,55 @@
 import sys
 
 import numpy as np
-from scipy.stats import spearmanr
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, MetaEstimatorMixin
+from sklearn.feature_selection import RFECV
 from sklearn.utils.validation import check_array, check_is_fitted
+
+from ml_project.models.utils import scorer, packY, unpackY
+
+
+class MetaClassifierRFE(RFECV):
+    """docstring"""
+
+    def __init__(self, cv, n_splits, shuffle, random_state, base_estimator,
+                 **base_estimator_args):
+        self.estimator = MetaClassifier(base_estimator, **base_estimator_args)
+        self.step = 1
+        self.cv = cv(n_splits, shuffle, random_state)
+        self.scoring = scorer
+        self.verbose = 0
+        self.n_jobs = 1
+
+    def fit(self, X, y):
+        y = packY(y)
+        super(MetaClassifierRFE, self).fit(X, y)
+        return self
 
 
 class MetaClassifier(BaseEstimator, TransformerMixin):
     """docstring"""
+
     def __init__(self, base_estimator, **kwargs):
-        self.base_estimator = base_estimator(**kwargs)
+        if str(type(base_estimator)) == "<class 'type'>":
+            self.base_estimator = base_estimator()
+        else:
+            self.base_estimator = base_estimator
+        self.base_estimator = self.base_estimator.set_params(**kwargs)
+
+    @property
+    def coef_(self):
+        return self.base_estimator.coef_
+
+    @property
+    def intercept_(self):
+        return self.base_estimator.intercept_
+
+    @property
+    def n_iter_(self):
+        return self.base_estimator.n_iter_
 
     def fit(self, X, y):
+        y = unpackY(y)
         n_samples, n_features = X.shape
         n_labels = y.shape[1]
         X = np.repeat(X, n_labels, 0)
@@ -24,21 +62,12 @@ class MetaClassifier(BaseEstimator, TransformerMixin):
         return self.base_estimator.predict_proba(X)
 
     def score(self, X, y):
-        ypred = self.predict_proba(X)
-        corrs = np.zeros(X.shape[0])
-        for i in range(0, X.shape[0]):
-            corrs[i] = spearmanr(y[i], ypred[i]).correlation
-
-        meanrho = np.mean(corrs)
-
-        print(meanrho)
-        sys.stdout.flush()
-
-        return meanrho
+        return scorer(self, X, y)
 
 
 class MeanPredictor(BaseEstimator, TransformerMixin):
     """docstring for MeanPredictor"""
+
     def fit(self, X, y):
         self.mean = y.mean(axis=0)
         return self

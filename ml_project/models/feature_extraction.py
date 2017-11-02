@@ -10,13 +10,11 @@ class ShadeExtraction(BaseEstimator, TransformerMixin):
     """Count how many pixels fall in each shade category"""
 
     def __init__(self,
-                 random_state=32,
                  n_shades=10,
                  max_range=None,
                  cube_x=16,
                  cube_y=16,
                  cube_z=16):
-        self.random_state = random_state
         self.n_shades = n_shades
         self.cube_x = cube_x
         self.cube_y = cube_y
