@@ -32,6 +32,30 @@ def unpackY(y):
     return ynew
 
 
+def arrayToInt(a, base=10):
+    res = 0
+    for i in a:
+        res *= base
+        res += i
+    return res
+
+
+def mapProbabilitiesToClasses(y, base=10):
+    y = np.floor(y*base)
+    for i in range(0, y.shape[0]):
+        y[i, 0] = arrayToInt(y[i], base)
+    return y[:, 0]
+
+
+def mapClassToProbabilities(y, minlength=4, base=10):
+    ynew = np.zeros((y.shape[0], minlength))
+    quot = y
+    for i in range(minlength-1, -1, -1):
+        quot, rem = np.divmod(quot, base)
+        ynew[:, i] = rem/base
+    return ynew
+
+
 class Debugger(BaseEstimator, TransformerMixin):
     """Debugger"""
 
