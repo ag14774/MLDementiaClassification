@@ -100,10 +100,10 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
         if self.dictargs is None:
             self.base_estimator = self.base_estimator.set_params(**self.kwargs)
         else:
-            # print(self.dictargs)
+            print(self.dictargs)
             self.base_estimator = self.base_estimator.set_params(
                 **self.dictargs)
-        # print(self.base_estimator)
+        print(self.base_estimator)
         y = mapProbabilitiesToClasses(y, 100)
         self.base_estimator.fit(X, y)
         return self
