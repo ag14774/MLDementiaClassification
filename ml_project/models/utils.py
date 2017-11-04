@@ -11,6 +11,7 @@ def scorer(estimator, X, y):
     ypred = estimator.predict_proba(X)
     corrs = np.zeros(X.shape[0])
     for i in range(0, X.shape[0]):
+        print(y[i], ypred[i])
         corrs[i] = spearmanr(y[i], ypred[i]).correlation
     meanrho = np.mean(corrs)
     print(meanrho)
