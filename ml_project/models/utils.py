@@ -26,6 +26,8 @@ def packY(y):
 
 
 def unpackY(y):
+    if len(y.shape) != 1:
+        return y
     ynew = np.zeros((y.shape[0], len(y[0])))
     for i, row in enumerate(y):
         ynew[i] = np.array(row)
