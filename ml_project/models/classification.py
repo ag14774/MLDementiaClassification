@@ -110,6 +110,7 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
 
     def predict_proba(self, X):
         pred = self.base_estimator.predict_proba(X)
+        pred = np.nan_to_num(pred, False)
         # print("Classes: ", self.base_estimator.classes_.astype(int))
         probs = mapClassToProbabilities(
             self.base_estimator.classes_.astype(int), minlength=4, base=100)
