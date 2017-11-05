@@ -13,7 +13,8 @@ def scorer(estimator, X, y):
     for i in range(0, X.shape[0]):
         print(y[i], ypred[i])
         corrs[i] = spearmanr(y[i], ypred[i]).correlation
-    meanrho = np.mean(corrs)
+    corrs = np.nan_to_num(corrs, False)
+    meanrho = np.nanmean(corrs)
     print(meanrho)
     sys.stdout.flush()
     return meanrho

@@ -122,7 +122,10 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
             # print("Before normalising: ", newProb[i])
             newProb[i] = newProb[i] / sum(newProb[i])
             # print("After normalising: ", newProb[i])
+        inds = np.where(np.isnan(newProb))
+        newProb[inds] = 0.25
         newProb = np.nan_to_num(newProb, False)
+        newProb[newProb == 0] = 1e-200
         return newProb
 
     def score(self, X, y):
