@@ -36,6 +36,11 @@ class MetaClassifier(BaseEstimator, TransformerMixin):
         else:
             self.base_estimator = base_estimator
         self.dictargs = dictargs
+        for key, val in self.dictargs.items():
+            try:
+                self.dictargs[key] = float(val)
+            except Exception:
+                pass
         self.kwargs = kwargs
 
     @property
