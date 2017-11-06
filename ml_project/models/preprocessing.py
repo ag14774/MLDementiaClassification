@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
+import skimage
+
 
 class AssignLabels(BaseEstimator, TransformerMixin):
     """docstring"""
@@ -105,4 +107,19 @@ class RearrangeToCubicParts(BaseEstimator, TransformerMixin):
                                                    self.orig_z))
         for i in range(0, X.shape[0]):
             X[i, :] = X[i, indices]
+        return X
+
+
+class NormaliseHistograms(BaseEstimator, TransformerMixin):
+    """docstring"""
+    def __init__(self, orig_x, orig_y, orig_z):
+        self.orig_x = orig_x
+        self.orig_y = orig_y
+        self.orig_z = orig_z
+
+    def fit(self, X, y=None):
+        X
+        return self
+
+    def transform(self, X, y=None):
         return X
