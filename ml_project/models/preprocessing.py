@@ -3,6 +3,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
 from skimage import exposure
+import matplotlib.pyplot as plt
 
 
 class AssignLabels(BaseEstimator, TransformerMixin):
@@ -125,5 +126,7 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
         for i, sample in enumerate(X):
             Xnew = exposure.equalize_hist(sample)
             X[i] = Xnew
+            plt.imshow(X[i, 70])
+            plt.show()
         X = X.reshape((X.shape[0], -1))
         return X
