@@ -40,8 +40,23 @@ class LogisticRegression2(LogisticRegression):
             verbose=0,
             warm_start=False,
             n_jobs=1)
+        self.penalty = penalty
+        self.dual = dual
+        self.tol = tol
+        self.C = C
+        self.fit_intercept = fit_intercept
+        self.intercept_scaling = intercept_scaling
+        self.class_weight = class_weight
+        self.random_state = random_state
+        self.solver = solver
+        self.max_iter = max_iter
+        self.multi_class = multi_class
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.n_jobs = n_jobs
 
     def fit(self, X, y):
+        print(self)
         n_samples, n_features = X.shape
         n_labels = y.shape[1]
         X = np.repeat(X, n_labels, 0)

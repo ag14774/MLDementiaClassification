@@ -5,18 +5,6 @@ from sklearn.utils.validation import check_array
 from skimage import exposure
 
 
-class AssignLabels(BaseEstimator, TransformerMixin):
-    """docstring"""
-
-    def fit(self, X, y=None):
-        if y is not None:
-            y = np.argmax(y, axis=1)
-        return self
-
-    def transform(self, X, y=None):
-        return X
-
-
 class RemoveZerosAndAlign(BaseEstimator, TransformerMixin):
     """docstring"""
 
@@ -113,15 +101,18 @@ class RearrangeToCubicParts(BaseEstimator, TransformerMixin):
 class NormaliseHistograms(BaseEstimator, TransformerMixin):
     """docstring"""
 
-    def __init__(self, orig_x, orig_y, orig_z):
+    def __init__(self, orig_x, orig_y, orig_z, skip=False):
         self.orig_x = orig_x
         self.orig_y = orig_y
         self.orig_z = orig_z
+        self.skip = skip
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
+        if self.skip is True:
+            return X
         X = X.astype(dtype='float16', copy=False)
         X = X.reshape(-1, self.orig_x, self.orig_y, self.orig_z)
         n = X.shape[0]
