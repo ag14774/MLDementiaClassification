@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
-import skimage
+from skimage import exposure
 
 
 class AssignLabels(BaseEstimator, TransformerMixin):
@@ -118,8 +118,12 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
         self.orig_z = orig_z
 
     def fit(self, X, y=None):
-        X
         return self
 
     def transform(self, X, y=None):
-        return X
+        X = X.reshape(-1, self.orig_x, self.orig_y, self.orig_z)
+        Xnew = np.zeros(X.shape)
+        for i, sample in enumerate(X):
+            Xnew[i] = exposure.equalize_hist(sample)
+        Xnew = Xnew.reshape(X.shape[0])
+        return Xnew
