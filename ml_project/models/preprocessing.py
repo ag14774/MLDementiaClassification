@@ -122,8 +122,8 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         X = X.reshape(-1, self.orig_x, self.orig_y, self.orig_z)
-        Xnew = np.zeros(X.shape)
         for i, sample in enumerate(X):
-            Xnew[i] = exposure.equalize_hist(sample)
-        Xnew = Xnew.reshape(X.shape[0])
+            Xnew = exposure.equalize_hist(sample)
+            X[i] = Xnew
+        X = X.reshape((X.shape[0], -1))
         return Xnew
