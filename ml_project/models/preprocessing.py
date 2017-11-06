@@ -126,4 +126,4 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
             Xnew = exposure.equalize_hist(sample)
             X[i] = Xnew
         X = X.reshape((X.shape[0], -1))
-        return Xnew
+        return X
