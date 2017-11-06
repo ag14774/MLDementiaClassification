@@ -64,7 +64,7 @@ class SelectPercentile2(SelectPercentile):
         if self.yMapMethod not in ['probability_map', 'argmax']:
             raise Exception("Unsupported y mapping method")
         if self.yMapMethod == 'probability_map':
-            ycopy = mapProbabilitiesToClasses(ycopy, 100)
+            ycopy = mapProbabilitiesToClasses(ycopy, 10)
         elif self.yMapMethod == 'argmax':
             ycopy = np.argmax(ycopy, axis=1)
         super(SelectPercentile2, self).fit(X, ycopy)

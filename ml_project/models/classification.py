@@ -104,7 +104,7 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
             self.base_estimator = self.base_estimator.set_params(
                 **self.dictargs)
         print(self.base_estimator)
-        y = mapProbabilitiesToClasses(y, 100)
+        y = mapProbabilitiesToClasses(y, 10)
         self.base_estimator.fit(X, y)
         return self
 
@@ -112,7 +112,7 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
         pred = self.base_estimator.predict_proba(X)
         # print("Classes: ", self.base_estimator.classes_.astype(int))
         probs = mapClassToProbabilities(
-            self.base_estimator.classes_.astype(int), minlength=4, base=100)
+            self.base_estimator.classes_.astype(int), minlength=4, base=10)
         # print("Probability map: ", probs)
         newProb = np.zeros((pred.shape[0], 4))
         for i in range(0, pred.shape[0]):
