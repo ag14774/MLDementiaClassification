@@ -3,7 +3,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
 from skimage import exposure
-import matplotlib.pyplot as plt
 
 
 class AssignLabels(BaseEstimator, TransformerMixin):
@@ -113,6 +112,7 @@ class RearrangeToCubicParts(BaseEstimator, TransformerMixin):
 
 class NormaliseHistograms(BaseEstimator, TransformerMixin):
     """docstring"""
+
     def __init__(self, orig_x, orig_y, orig_z):
         self.orig_x = orig_x
         self.orig_y = orig_y
@@ -122,11 +122,10 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X, y=None):
+        X = X.astype(dtype='float16', copy=False)
         X = X.reshape(-1, self.orig_x, self.orig_y, self.orig_z)
-        for i, sample in enumerate(X):
-            Xnew = exposure.equalize_hist(sample)
-            X[i] = Xnew
-            plt.imshow(X[i, 70])
-            plt.show()
-        X = X.reshape((X.shape[0], -1))
+        n = X.shape[0]
+        for i in range(n):
+            X[i] = exposure.equalize_hist(X[i])
+        X = X.reshape(-1, self.orig_x*self.orig_y*self.orig_z)
         return X
