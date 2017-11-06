@@ -3,10 +3,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_selection import RFECV
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ml_project.models.utils import (StratifiedKFoldProbLabels,
-                                     mapClassToProbabilities,
-                                     mapProbabilitiesToClasses, packY, scorer,
-                                     unpackY)
+from ml_project.models.utils import (
+    StratifiedKFoldProbLabels, mapClassToProbabilities,
+    mapProbabilitiesToClasses, packY, scorer, unpackY)
 
 
 class MetaClassifierRFE(RFECV):
@@ -31,7 +30,7 @@ class MetaClassifierRFE(RFECV):
 class MetaClassifier(BaseEstimator, TransformerMixin):
     """docstring"""
 
-    def __init__(self, base_estimator, dictargs=None, **kwargs):
+    def __init__(self, base_estimator, dictargs={}, **kwargs):
         if str(type(base_estimator)) == "<class 'type'>":
             self.base_estimator = base_estimator()
         else:
@@ -52,11 +51,9 @@ class MetaClassifier(BaseEstimator, TransformerMixin):
         return self.base_estimator.n_iter_
 
     def fit(self, X, y):
-        if self.dictargs is None:
-            self.base_estimator = self.base_estimator.set_params(**self.kwargs)
-        else:
-            self.base_estimator = self.base_estimator.set_params(
-                **self.dictargs)
+        self.dictargs.update(self.kwargs)
+        self.base_estimator = self.base_estimator.set_params(**self.dictargs)
+        print(self.base_estimator)
         y = unpackY(y)
         n_samples, n_features = X.shape
         n_labels = y.shape[1]
