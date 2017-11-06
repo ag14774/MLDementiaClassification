@@ -1,55 +1,57 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ml_project.models.utils import (
-    StratifiedKFoldProbLabels, mapClassToProbabilities,
-    mapProbabilitiesToClasses, packY, scorer, unpackY)
+from ml_project.models.utils import (mapClassToProbabilities,
+                                     mapProbabilitiesToClasses, scorer)
 
 
-class MetaClassifier(BaseEstimator, TransformerMixin):
-    """docstring"""
+class LogisticRegression2(LogisticRegression):
+    """doctstring"""
 
-    def __init__(self, base_estimator, dictargs={}, **kwargs):
-        if str(type(base_estimator)) == "<class 'type'>":
-            self.base_estimator = base_estimator()
-        else:
-            self.base_estimator = base_estimator
-        self.dictargs = dictargs
-        self.kwargs = kwargs
-
-    @property
-    def coef_(self):
-        return self.base_estimator.coef_
-
-    @property
-    def intercept_(self):
-        return self.base_estimator.intercept_
-
-    @property
-    def n_iter_(self):
-        return self.base_estimator.n_iter_
+    def __init__(self,
+                 penalty='l2',
+                 dual=False,
+                 tol=0.0001,
+                 C=1.0,
+                 fit_intercept=True,
+                 intercept_scaling=1,
+                 class_weight=None,
+                 random_state=None,
+                 solver='liblinear',
+                 max_iter=100,
+                 multi_class='ovr',
+                 verbose=0,
+                 warm_start=False,
+                 n_jobs=1):
+        super(LogisticRegression2, self).__init__(
+            penalty='l2',
+            dual=False,
+            tol=0.0001,
+            C=1.0,
+            fit_intercept=True,
+            intercept_scaling=1,
+            class_weight=None,
+            random_state=None,
+            solver='liblinear',
+            max_iter=100,
+            multi_class='ovr',
+            verbose=0,
+            warm_start=False,
+            n_jobs=1)
 
     def fit(self, X, y):
-        self.dictargs.update(self.kwargs)
-        for key, val in self.dictargs.items():
-            try:
-                self.dictargs[key] = float(val)
-            except Exception as e:
-                pass
-        self.base_estimator = self.base_estimator.set_params(**self.dictargs)
-        print(self.base_estimator)
-        y = unpackY(y)
         n_samples, n_features = X.shape
         n_labels = y.shape[1]
         X = np.repeat(X, n_labels, 0)
         weights = y.reshape(-1)
         y = np.tile(np.arange(n_labels), n_samples)
-        self.base_estimator.fit(X, y, weights)
+        super(LogisticRegression2, self).fit(X, y, weights)
         return self
 
     def predict_proba(self, X):
-        return self.base_estimator.predict_proba(X)
+        return super(LogisticRegression2, self).predict_proba(X)
 
     def score(self, X, y):
         return scorer(self, X, y)
@@ -80,11 +82,6 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y):
         self.dictargs.update(self.kwargs)
-        for key, val in self.dictargs.items():
-            try:
-                self.dictargs[key] = float(val)
-            except Exception as e:
-                pass
         self.base_estimator = self.base_estimator.set_params(**self.dictargs)
         print(self.base_estimator)
         y = mapProbabilitiesToClasses(y, 10)
