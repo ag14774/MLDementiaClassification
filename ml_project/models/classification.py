@@ -1,30 +1,10 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_selection import RFECV
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ml_project.models.utils import (
     StratifiedKFoldProbLabels, mapClassToProbabilities,
     mapProbabilitiesToClasses, packY, scorer, unpackY)
-
-
-class MetaClassifierRFE(RFECV):
-    """docstring"""
-
-    def __init__(self, step, n_splits, shuffle, random_state, base_estimator,
-                 **base_estimator_args):
-        self.estimator = MetaClassifier(base_estimator, **base_estimator_args)
-        self.step = step
-        self.cv = StratifiedKFoldProbLabels(n_splits, shuffle, random_state)
-        self.scoring = scorer
-        self.verbose = 0
-        self.n_jobs = 1
-
-    def fit(self, X, y):
-        y = packY(y)
-        super(MetaClassifierRFE, self).fit(X, y)
-        print("Selected " + str(self.n_features_))
-        return self
 
 
 class MetaClassifier(BaseEstimator, TransformerMixin):
@@ -36,11 +16,6 @@ class MetaClassifier(BaseEstimator, TransformerMixin):
         else:
             self.base_estimator = base_estimator
         self.dictargs = dictargs
-        for key, val in self.dictargs.items():
-            try:
-                self.dictargs[key] = float(val)
-            except Exception:
-                pass
         self.kwargs = kwargs
 
     @property
@@ -57,6 +32,11 @@ class MetaClassifier(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y):
         self.dictargs.update(self.kwargs)
+        for key, val in self.dictargs.items():
+            try:
+                self.dictargs[key] = float(val)
+            except Exception as e:
+                pass
         self.base_estimator = self.base_estimator.set_params(**self.dictargs)
         print(self.base_estimator)
         y = unpackY(y)
@@ -99,12 +79,13 @@ class MetaClassifierProbabilityMap(BaseEstimator, TransformerMixin):
         return self.base_estimator.n_iter_
 
     def fit(self, X, y):
-        if self.dictargs is None:
-            self.base_estimator = self.base_estimator.set_params(**self.kwargs)
-        else:
-            print(self.dictargs)
-            self.base_estimator = self.base_estimator.set_params(
-                **self.dictargs)
+        self.dictargs.update(self.kwargs)
+        for key, val in self.dictargs.items():
+            try:
+                self.dictargs[key] = float(val)
+            except Exception as e:
+                pass
+        self.base_estimator = self.base_estimator.set_params(**self.dictargs)
         print(self.base_estimator)
         y = mapProbabilitiesToClasses(y, 10)
         self.base_estimator.fit(X, y)
