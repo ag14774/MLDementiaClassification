@@ -101,10 +101,11 @@ class RearrangeToCubicParts(BaseEstimator, TransformerMixin):
 class NormaliseHistograms(BaseEstimator, TransformerMixin):
     """docstring"""
 
-    def __init__(self, orig_x, orig_y, orig_z, skip=False):
+    def __init__(self, orig_x, orig_y, orig_z, nbins=256, skip=False):
         self.orig_x = orig_x
         self.orig_y = orig_y
         self.orig_z = orig_z
+        self.nbins = nbins
         self.skip = skip
 
     def fit(self, X, y=None):
@@ -117,6 +118,6 @@ class NormaliseHistograms(BaseEstimator, TransformerMixin):
         X = X.reshape(-1, self.orig_x, self.orig_y, self.orig_z)
         n = X.shape[0]
         for i in range(n):
-            X[i] = exposure.equalize_hist(X[i])
+            X[i] = exposure.equalize_hist(X[i], nbins=self.nbins)
         X = X.reshape(-1, self.orig_x*self.orig_y*self.orig_z)
         return X
