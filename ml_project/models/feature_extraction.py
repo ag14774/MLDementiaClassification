@@ -49,4 +49,7 @@ class ShadeExtraction(BaseEstimator, TransformerMixin):
 
         X = X[:, 0:hist_num * self.n_shades]
 
+        print("Shape before bin count: ", X.shape)
+        sys.stdout.flush()
+
         return X
