@@ -4,7 +4,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ml_project.models.utils import (mapClassToProbabilities,
-                                     mapProbabilitiesToClasses, scorer)
+                                     mapProbabilitiesToClasses, post_process_y,
+                                     post_process_y2, scorer)
 
 
 class LogisticRegression2(LogisticRegression):
@@ -24,7 +25,8 @@ class LogisticRegression2(LogisticRegression):
                  multi_class='ovr',
                  verbose=0,
                  warm_start=False,
-                 n_jobs=1):
+                 n_jobs=1,
+                 post_process_threshold=0.35):
         super(LogisticRegression2, self).__init__(
             penalty='l2',
             dual=False,
@@ -54,6 +56,7 @@ class LogisticRegression2(LogisticRegression):
         self.verbose = verbose
         self.warm_start = warm_start
         self.n_jobs = n_jobs
+        self.post_process_threshold = post_process_threshold
 
     def fit(self, X, y):
         print(self)
@@ -66,7 +69,8 @@ class LogisticRegression2(LogisticRegression):
         return self
 
     def predict_proba(self, X):
-        return super(LogisticRegression2, self).predict_proba(X)
+        ypred = super(LogisticRegression2, self).predict_proba(X)
+        return post_process_y2(ypred, threshold=self.post_process_threshold)
 
     def score(self, X, y):
         return scorer(self, X, y)
