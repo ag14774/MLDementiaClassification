@@ -40,6 +40,8 @@ def post_process_y(y, eps=0.06, min_samples=2):
 def post_process_y2(y, threshold=0.35):
     maxprob = np.max(y, axis=1)
     lowerthanthresh = maxprob < threshold
+    if sum(lowerthanthresh) <= 0:
+        return y
     y[lowerthanthresh] = 1
     return y
 
