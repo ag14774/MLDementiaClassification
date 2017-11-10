@@ -26,7 +26,10 @@ class LogisticRegression2(LogisticRegression):
                  verbose=0,
                  warm_start=False,
                  n_jobs=1,
-                 post_process_threshold=0.35):
+                 post_process_method='simple',
+                 post_process_threshold=0.35,
+                 post_process_min_samples=2,
+                 post_process_eps=0.03):
         super(LogisticRegression2, self).__init__(
             penalty='l2',
             dual=False,
@@ -56,7 +59,10 @@ class LogisticRegression2(LogisticRegression):
         self.verbose = verbose
         self.warm_start = warm_start
         self.n_jobs = n_jobs
+        self.post_process_method = post_process_method
         self.post_process_threshold = post_process_threshold
+        self.post_process_min_samples = post_process_min_samples
+        self.post_process_eps = post_process_eps
 
     def fit(self, X, y):
         print(self)
@@ -70,7 +76,16 @@ class LogisticRegression2(LogisticRegression):
 
     def predict_proba(self, X):
         ypred = super(LogisticRegression2, self).predict_proba(X)
-        return post_process_y2(ypred, threshold=self.post_process_threshold)
+        if self.post_process_method == "simple":
+            return post_process_y2(
+                ypred, threshold=self.post_process_threshold)
+        elif self.post_process_method == "advanced":
+            return post_process_y2(
+                ypred,
+                eps=self.post_process_eps,
+                min_samples=self.post_process_min_samples)
+        else:
+            return ypred
 
     def score(self, X, y):
         return scorer(self, X, y)
