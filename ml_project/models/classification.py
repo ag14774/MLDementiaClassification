@@ -2,10 +2,54 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_array, check_is_fitted
-
+from sklearn.ensemble import RandomForestClassifier
 from ml_project.models.utils import (mapClassToProbabilities,
                                      mapProbabilitiesToClasses, post_process_y,
                                      post_process_y2, scorer)
+
+
+class RandomForestClassifier2(RandomForestClassifier):
+    def __init__(self,
+                 n_estimators=10,
+                 criterion='gini',
+                 max_depth=None,
+                 min_samples_split=2,
+                 min_samples_leaf=1,
+                 min_weight_fraction_leaf=0.0,
+                 max_features='auto',
+                 max_leaf_nodes=None,
+                 min_impurity_split=1e-07,
+                 bootstrap=True,
+                 oob_score=False,
+                 n_jobs=1,
+                 random_state=None,
+                 verbose=0,
+                 warm_start=False,
+                 class_weight=None,
+                 post_process_threshold=0.3):
+        super(RandomForestClassifier2, self).__init__(
+            n_estimators, criterion, max_depth, min_samples_split,
+            min_samples_leaf, min_weight_fraction_leaf, max_features,
+            max_leaf_nodes, min_impurity_split, bootstrap, oob_score, n_jobs,
+            random_state, verbose, warm_start, class_weight)
+        self.post_process_threshold = post_process_threshold
+
+    def fit(self, X, y):
+        print(self)
+        n_samples, n_features = X.shape
+        n_labels = y.shape[1]
+        X = np.repeat(X, n_labels, 0)
+        weights = y.reshape(-1)
+        y = np.tile(np.arange(n_labels), n_samples)
+        super(RandomForestClassifier2, self).fit(X, y, weights)
+        return self
+
+    def predict_proba(self, X):
+        ypred = super(RandomForestClassifier2, self).predict_proba(X)
+        return post_process_y2(ypred, threshold=self.post_process_threshold)
+
+    def score(self, X, y):
+        return scorer(self, X, y)
 
 
 class LogisticRegression2(LogisticRegression):
@@ -31,20 +75,9 @@ class LogisticRegression2(LogisticRegression):
                  post_process_min_samples=2,
                  post_process_eps=0.03):
         super(LogisticRegression2, self).__init__(
-            penalty='l2',
-            dual=False,
-            tol=0.0001,
-            C=1.0,
-            fit_intercept=True,
-            intercept_scaling=1,
-            class_weight=None,
-            random_state=None,
-            solver='liblinear',
-            max_iter=100,
-            multi_class='ovr',
-            verbose=0,
-            warm_start=False,
-            n_jobs=1)
+            penalty, dual, tol, C, fit_intercept, intercept_scaling,
+            class_weight, random_state, solver, max_iter, multi_class, verbose,
+            warm_start, n_jobs)
         self.penalty = penalty
         self.dual = dual
         self.tol = tol
