@@ -80,7 +80,7 @@ class LogisticRegression2(LogisticRegression):
             return post_process_y2(
                 ypred, threshold=self.post_process_threshold)
         elif self.post_process_method == "advanced":
-            return post_process_y2(
+            return post_process_y(
                 ypred,
                 eps=self.post_process_eps,
                 min_samples=self.post_process_min_samples)
