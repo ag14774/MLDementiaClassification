@@ -38,6 +38,20 @@ class LogisticAdaBoost(AdaBoostClassifier):
             penalty, dual, tol, C, fit_intercept, intercept_scaling,
             class_weight, random_state, solver, max_iter, multi_class, verbose,
             warm_start_logistic, 1)
+        self.penalty = penalty
+        self.dual = dual
+        self.tol = tol
+        self.C = C
+        self.fit_intercept = fit_intercept
+        self.intercept_scaling = intercept_scaling
+        self.class_weight = class_weight
+        self.random_state = random_state
+        self.solver = solver
+        self.max_iter = max_iter
+        self.multi_class = multi_class
+        self.verbose = verbose
+        self.warm_start_logistic = warm_start_logistic
+        self.n_jobs = 1
         super(LogisticAdaBoost,
               self).__init__(base_estimator, n_estimators, learning_rate,
                              algorithm, random_state)
@@ -47,6 +61,11 @@ class LogisticAdaBoost(AdaBoostClassifier):
         self.post_process_eps = post_process_eps
 
     def fit(self, X, y):
+        self.base_estimator.set_params(
+            self.penalty, self.dual, self.tol, self.C, self.fit_intercept,
+            self.intercept_scaling, self.class_weight, self.random_state,
+            self.solver, self.max_iter, self.multi_class, self.verbose,
+            self.warm_start_logistic, self.n_jobs)
         print(self)
         n_samples, n_features = X.shape
         n_labels = y.shape[1]
