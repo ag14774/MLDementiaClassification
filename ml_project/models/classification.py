@@ -1,11 +1,145 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.ensemble import (AdaBoostClassifier, BaggingClassifier,
+                              RandomForestClassifier)
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_array, check_is_fitted
-from sklearn.ensemble import RandomForestClassifier
+
 from ml_project.models.utils import (mapClassToProbabilities,
                                      mapProbabilitiesToClasses, post_process_y,
                                      post_process_y2, scorer)
+
+
+class LogisticAdaBoost(AdaBoostClassifier):
+    """doctstring"""
+
+    def __init__(self,
+                 n_estimators=10,
+                 learning_rate=1.0,
+                 algorithm='SAMME.R',
+                 verbose=0,
+                 penalty='l2',
+                 dual=False,
+                 tol=0.0001,
+                 C=1.0,
+                 fit_intercept=True,
+                 intercept_scaling=1,
+                 class_weight=None,
+                 random_state=None,
+                 solver='liblinear',
+                 max_iter=100,
+                 multi_class='ovr',
+                 warm_start_logistic=False,
+                 post_process_method='simple',
+                 post_process_threshold=0.35,
+                 post_process_min_samples=2,
+                 post_process_eps=0.03):
+        base_estimator = LogisticRegression(
+            penalty, dual, tol, C, fit_intercept, intercept_scaling,
+            class_weight, random_state, solver, max_iter, multi_class, verbose,
+            warm_start_logistic, 1)
+        super(LogisticAdaBoost,
+              self).__init__(base_estimator, n_estimators, learning_rate,
+                             algorithm, random_state)
+        self.post_process_method = post_process_method
+        self.post_process_threshold = post_process_threshold
+        self.post_process_min_samples = post_process_min_samples
+        self.post_process_eps = post_process_eps
+
+    def fit(self, X, y):
+        print(self)
+        n_samples, n_features = X.shape
+        n_labels = y.shape[1]
+        X = np.repeat(X, n_labels, 0)
+        weights = y.reshape(-1)
+        y = np.tile(np.arange(n_labels), n_samples)
+        super(LogisticAdaBoost, self).fit(X, y, weights)
+        return self
+
+    def predict_proba(self, X):
+        ypred = super(LogisticAdaBoost, self).predict_proba(X)
+        if self.post_process_method == "simple":
+            return post_process_y2(
+                ypred, threshold=self.post_process_threshold)
+        elif self.post_process_method == "advanced":
+            return post_process_y(
+                ypred,
+                eps=self.post_process_eps,
+                min_samples=self.post_process_min_samples)
+        else:
+            return ypred
+
+    def score(self, X, y):
+        return scorer(self, X, y)
+
+
+class LogisticBagging(BaggingClassifier):
+    """doctstring"""
+
+    def __init__(self,
+                 n_estimators=10,
+                 max_samples=1.0,
+                 max_features=1.0,
+                 bootstrap=True,
+                 bootstrap_features=False,
+                 oob_score=False,
+                 warm_start_bagging=False,
+                 n_jobs=1,
+                 verbose=0,
+                 penalty='l2',
+                 dual=False,
+                 tol=0.0001,
+                 C=1.0,
+                 fit_intercept=True,
+                 intercept_scaling=1,
+                 class_weight=None,
+                 random_state=None,
+                 solver='liblinear',
+                 max_iter=100,
+                 multi_class='ovr',
+                 warm_start_logistic=False,
+                 post_process_method='simple',
+                 post_process_threshold=0.35,
+                 post_process_min_samples=2,
+                 post_process_eps=0.03):
+        base_estimator = LogisticRegression(
+            penalty, dual, tol, C, fit_intercept, intercept_scaling,
+            class_weight, random_state, solver, max_iter, multi_class, verbose,
+            warm_start_logistic, 1)
+        super(LogisticBagging, self).__init__(
+            base_estimator, n_estimators, max_samples, max_features, bootstrap,
+            bootstrap_features, oob_score, warm_start_bagging, n_jobs,
+            random_state, verbose)
+        self.post_process_method = post_process_method
+        self.post_process_threshold = post_process_threshold
+        self.post_process_min_samples = post_process_min_samples
+        self.post_process_eps = post_process_eps
+
+    def fit(self, X, y):
+        print(self)
+        n_samples, n_features = X.shape
+        n_labels = y.shape[1]
+        X = np.repeat(X, n_labels, 0)
+        weights = y.reshape(-1)
+        y = np.tile(np.arange(n_labels), n_samples)
+        super(LogisticBagging, self).fit(X, y, weights)
+        return self
+
+    def predict_proba(self, X):
+        ypred = super(LogisticBagging, self).predict_proba(X)
+        if self.post_process_method == "simple":
+            return post_process_y2(
+                ypred, threshold=self.post_process_threshold)
+        elif self.post_process_method == "advanced":
+            return post_process_y(
+                ypred,
+                eps=self.post_process_eps,
+                min_samples=self.post_process_min_samples)
+        else:
+            return ypred
+
+    def score(self, X, y):
+        return scorer(self, X, y)
 
 
 class RandomForestClassifier2(RandomForestClassifier):
