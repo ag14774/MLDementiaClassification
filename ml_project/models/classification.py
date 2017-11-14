@@ -74,7 +74,7 @@ class LogisticAdaBoost(AdaBoostClassifier):
             max_iter=self.max_iter,
             multi_class=self.multi_class,
             verbose=self.verbose,
-            warm_start_logistic=self.warm_start_logistic,
+            warm_start=self.warm_start_logistic,
             n_jobs=self.n_jobs)
         print(self)
         n_samples, n_features = X.shape
