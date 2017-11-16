@@ -5,9 +5,64 @@ from sklearn.ensemble import (AdaBoostClassifier, BaggingClassifier,
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from ml_project.models.feature_selection import RFEWithSampleWeights
 from ml_project.models.utils import (mapClassToProbabilities,
                                      mapProbabilitiesToClasses, post_process_y,
                                      post_process_y2, scorer)
+
+
+class LogisticRFE(RFEWithSampleWeights):
+    def __init__(self,
+                 n_features_to_select=None,
+                 step=1,
+                 verbose=0,
+                 penalty='l2',
+                 dual=False,
+                 tol=0.0001,
+                 C=1.0,
+                 fit_intercept=True,
+                 intercept_scaling=1,
+                 class_weight=None,
+                 random_state=None,
+                 solver='liblinear',
+                 max_iter=100,
+                 multi_class='ovr',
+                 warm_start=False,
+                 n_jobs=1):
+        self.n_features_to_select = n_features_to_select
+        self.step = step
+        self.penalty = penalty
+        self.dual = dual
+        self.tol = tol
+        self.C = C
+        self.fit_intercept = fit_intercept
+        self.intercept_scaling = intercept_scaling
+        self.class_weight = class_weight
+        self.random_state = random_state
+        self.solver = solver
+        self.max_iter = max_iter
+        self.multi_class = multi_class
+        self.verbose = verbose
+        self.warm_start = warm_start
+        self.n_jobs = n_jobs
+
+    def fit(self, X, y):
+        print(self)
+        self.estimator = LogisticRegression(
+            self.penalty, self.dual, self.tol, self.C, self.fit_intercept,
+            self.intercept_scaling, self.class_weight, self.random_state,
+            self.solver, self.max_iter, self.multi_class, self.verbose,
+            self.warm_start, self.n_jobs)
+        n_samples, n_features = X.shape
+        n_labels = y.shape[1]
+        X = np.repeat(X, n_labels, 0)
+        weights = y.reshape(-1)
+        y = np.tile(np.arange(n_labels), n_samples)
+        super(RFEWithSampleWeights, self).fit(X, y, sample_weight=weights)
+        return self
+
+    def score(self, X, y):
+        return scorer(self, X, y)
 
 
 class LogisticAdaBoost(AdaBoostClassifier):
