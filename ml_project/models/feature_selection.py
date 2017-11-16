@@ -64,6 +64,7 @@ class RFEWithSampleWeights(RFE):
 
         # Elimination
         while np.sum(support_) > n_features_to_select:
+            print("Features remaining: ", np.sum(support_))
             # Remaining features
             features = np.arange(n_features)[support_]
 
