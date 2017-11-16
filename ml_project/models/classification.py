@@ -58,7 +58,7 @@ class LogisticRFE(RFEWithSampleWeights):
         X = np.repeat(X, n_labels, 0)
         weights = y.reshape(-1)
         y = np.tile(np.arange(n_labels), n_samples)
-        super(RFEWithSampleWeights, self).fit(X, y, sample_weight=weights)
+        super(LogisticRFE, self).fit(X, y, sample_weight=weights)
         return self
 
     def score(self, X, y):
