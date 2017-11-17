@@ -67,6 +67,7 @@ class RFEWithSampleWeights(RFE):
             print("Features remaining: ", np.sum(support_))
             # Remaining features
             features = np.arange(n_features)[support_]
+            sys.stdout.flush()
 
             # Rank the remaining features
             estimator = clone(self.estimator)
