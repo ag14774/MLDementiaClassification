@@ -12,6 +12,7 @@ class ShadeExtraction(BaseEstimator, TransformerMixin):
     def __init__(self,
                  n_shades=10,
                  max_range=None,
+                 min_range=1,
                  cube_x=16,
                  cube_y=16,
                  cube_z=16):
@@ -20,6 +21,7 @@ class ShadeExtraction(BaseEstimator, TransformerMixin):
         self.cube_y = cube_y
         self.cube_z = cube_z
         self.max_range = max_range
+        self.min_range = min_range
         self.boundaries = None
 
     def fit(self, X, y=None):
